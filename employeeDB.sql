@@ -25,6 +25,32 @@ SELECT * FROM Employees;
 
 -- Analysis
 
+--> Basic duplicate detection (same salary):Finds employees who share the same salary with others.
+SELECT Emp1.EmployeeID, Emp1.FullName, Emp1.Salary
+FROM Employees Emp1
+JOIN Employees Emp2
+  ON Emp1.Salary = Emp2.Salary
+ AND Emp1.EmployeeID <> Emp2.EmployeeID;
+
+--> Duplicate by name (FullName): Lists names that appear more than once.
+SELECT FullName, COUNT(*) AS Cnt
+FROM Employees
+GROUP BY FullName
+HAVING COUNT(*) > 1;
+
+--> Duplicate by multiple columns (FullName + DeptID): Detects employees with same name in same department.
+SELECT FullName, DeptID, COUNT(*) AS Cnt
+FROM Employees
+GROUP BY FullName, DeptID
+HAVING COUNT(*) > 1;
+
+--> Count duplicates (Salary): Shows which salaries are repeated and how many times.
+SELECT Salary, COUNT(*) AS Cnt
+FROM Employees
+GROUP BY Salary
+HAVING COUNT(*) > 1;
+
+
 /* 1. Find employees with highest salary in a department.
 
  Hint-  1) Find maximum salary in each department and then find the employee whose salary is equal to the maximum salary.
@@ -218,7 +244,7 @@ ORDER BY DeptID, FullName;
 
 AVG(Salary * 1.0) OVER (PARTITION BY DeptID) AS DeptAvg
 
-  AVG() is an aggregate function, but here it’s used as a window function.
+  AVG() is an aggregate function, but here itÂ’s used as a window function.
   Salary * 1.0 ensures SQL does floating-point division (not integer division).
   This gives each row the average salary of its department (e.g., every employee in Dept 1 gets the same DeptAvg).
 
@@ -229,7 +255,7 @@ SUM(CASE WHEN Salary > 0.9 * DeptAvg
 ) OVER (PARTITION BY DeptID) AS HighEarnersCount
 
   CASE WHEN ... THEN 1 ELSE 0 END - marks employees as 1 if their salary is greater than 90% of dept average, otherwise 0.
-  SUM(...) OVER (PARTITION BY DeptID) - adds up those 1s within each department, giving the count of “high earners” in that dept.
+  SUM(...) OVER (PARTITION BY DeptID) - adds up those 1s within each department, giving the count of Â“high earnersÂ” in that dept.
   This is more efficient than doing a separate GROUP BY and joining back.
 
 - Filtering results: Query
@@ -249,7 +275,7 @@ WHERE HighEarnersCount >= 2
 - Why use this approach?
 
 	Compact: Everything is calculated in one pass of the table, no need for multiple CTEs or joins.
-	Readable: Business logic is easy to see - “find dept avg, count employees > 90% of avg, filter where count > = 2”.
+	Readable: Business logic is easy to see - Â“find dept avg, count employees > 90% of avg, filter where count > = 2Â”.
 	Flexible: You can change the threshold (90%) or required count (2) with minimal edits.
 	Window functions: They let you mix aggregate-style calculations (AVG, SUM) with row-level detail without losing per-employee info. */
 
@@ -268,6 +294,7 @@ FROM employees
 GROUP BY deptid
 HAVING COUNT(*) > 2
 ORDER BY Prcnt_of_employee DESC;
+
 
 /*  Explanation
 
